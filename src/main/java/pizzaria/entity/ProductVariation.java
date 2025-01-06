@@ -1,4 +1,4 @@
-package entity;
+package pizzaria.entity;
 
 import jakarta.persistence.*;
 import lombok.*;
