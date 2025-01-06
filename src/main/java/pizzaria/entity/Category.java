@@ -1,4 +1,4 @@
-package entity;
+package pizzaria.entity;
 
 public enum Category {
     PIZZA,
