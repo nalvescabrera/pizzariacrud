@@ -15,7 +15,6 @@ import java.util.List;
 @Service
 public class ProductService {
 
-
     @Autowired
     private ProductRepository productRepository;
 
@@ -25,7 +24,9 @@ public class ProductService {
     @Autowired
     private ProductMapper productMapper;
 
-    // Método responsável por criar um produto
+    private ProductVariation productVariation;
+
+    // Metodo responsável por criar um produto
     public RecoveryProductDto createProduct(CreateProductDto createProductDto) {
         /*
         Converte a lista de ProductVariationDto em uma lista de ProductVariation,
@@ -62,7 +63,7 @@ public class ProductService {
         return productMapper.mapProductToRecoveryProductDto(productSaved);
     }
 
-    // Método responsável por criar uma variação de produto
+    // Metodo responsável por criar uma variação de produto
     public RecoveryProductDto createProductVariation(Long productId, CreateProductVariationDto createProductVariationDto) {
 
         Product product = productRepository.findById(productId).orElseThrow(() -> new RuntimeException("Produto não encontrado."));
@@ -82,7 +83,7 @@ public class ProductService {
         return productMapper.mapProductToRecoveryProductDto(productVariationSaved.getProduct());
     }
 
-    // Método responsável por retornar todos os produtos
+    // Metodo responsável por retornar todos os produtos
     public List<RecoveryProductDto> getProducts() {
         // Retorna todos os produtos salvos no banco
         List<Product> products = productRepository.findAll();
@@ -91,10 +92,15 @@ public class ProductService {
         return products.stream().map(product -> productMapper.mapProductToRecoveryProductDto(product)).toList();
     }
 
-    // Método responsável por retornar o produto por id
+    // Metodo responsável por retornar o produto por id
     public RecoveryProductDto getProductById(Long productId) {
-        // Producra por um produto salvo no banco
-        Product product = productRepository.findById(productId).orElseThrow(() -> new RuntimeException("Produto não encontrado."));
+
+        Product product = productRepository.findById(productId).isPresent();
+        if (product) {
+            return productMapper.mapProductToRecoveryProductDto(productId);
+        } else{
+           throw new RuntimeException("Produto não encontrado.");
+        }
 
         // Retornando e mapeando os produtos para o tipo RecoveryProductDto
         return productMapper.mapProductToRecoveryProductDto(product);
@@ -130,7 +136,7 @@ public class ProductService {
         return productMapper.mapProductToRecoveryProductDto(productRepository.save(product));
     }
 
-    // Método responsável por atualizar uma variação de produto
+    // Metodo responsável por atualizar uma variação de produto
     public RecoveryProductDto updateProductVariation(Long productId, Long productVariationId, UpdateProductVariationDto updateProductVariationDto) {
         // Verifica se o produto existe
         Product product = productRepository.findById(productId).orElseThrow(() -> new RuntimeException("Produto não encontrado."));
@@ -171,7 +177,7 @@ public class ProductService {
         return productMapper.mapProductToRecoveryProductDto(productSaved);
     }
 
-    // Método responsável por deletar um produto pelo id
+    // Metodo responsável por deletar um produto pelo id
     public void deleteProductId(Long productId) {
         // Verifica se o produto existe
         if (!productRepository.existsById(productId)) {
@@ -181,14 +187,12 @@ public class ProductService {
         productRepository.deleteById(productId);
     }
 
-    // Método responsável por deletar uma variação de produto pelo id
+    // Metodo responsável por deletar uma variação de produto pelo id
     public void deleteProductVariationById(Long productId, Long productVariationId) {
-        // Verifica se a variação de produto existe no produto em questão
-        ProductVariation productVariation = productVariationRepository
-                .findByProductIdAdProductVariationId(productId, productVariationId)
-                .orElseThrow(() -> new RuntimeException("Variação de produto não encontrada para o produto em questão."));
-
-        // Deleta a variação de produto do banco de dados
-        productVariationRepository.deleteById(productVariation.getId());
+        if(productId == productVariationId){
+            productVariationRepository.deleteById(productVariation.getId());
+        } else {
+            throw new RuntimeException("Variação de produto não encontrada para o produto em questão.");
+        }
     }
 }
