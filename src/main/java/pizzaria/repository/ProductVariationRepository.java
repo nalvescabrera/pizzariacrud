@@ -6,9 +6,9 @@ import org.springframework.data.repository.query.Param;
 
 import java.util.Optional;
 
-public interface ProductVariation extends JpaRepository<ProductVariation, Long> {
+public interface ProductVariationRepository extends JpaRepository<ProductVariationRepository, Long> {
 
     @Query("select pv from ProductVariation pv where pv.product.id = :productId and pv.id = :productVariationId")
-    Optional<ProductVariation> findByProductIdAdProductVariationId(@Param("productId") Long productId, @Param("productVariationId") Long productVariationId);
+    Optional<ProductVariationRepository> findByProductIdAdProductVariationId(@Param("productId") Long productId, @Param("productVariationId") Long productVariationId);
 
 }
